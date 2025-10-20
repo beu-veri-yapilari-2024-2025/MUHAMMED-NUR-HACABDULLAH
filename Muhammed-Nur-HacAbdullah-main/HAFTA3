@@ -1,0 +1,438 @@
+namespace veri_yapıları_ödev
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Security.Cryptography.X509Certificates;
+    using System.Text;
+    using System.Threading.Tasks;
+
+    namespace ConsoleApp30
+    {
+        public class OgrenciNode
+        {
+            public string numara;
+            public string ad;
+            public string soyad;
+            public OgrenciNode Next;
+
+            public OgrenciNode(string _numara, string _ad, string _soyad)
+            {
+                numara = _numara;
+                ad = _ad;
+                soyad = _soyad;
+                Next = null;
+            }
+        }
+
+        public class BagliListe
+        {
+            private OgrenciNode head;
+            private OgrenciNode tail;
+
+            public BagliListe()
+            {
+                head = null;
+                tail = null;
+            }
+
+            public void BasaEkle(OgrenciNode yeniOgrenci)
+            {
+                if (head == null)
+                {
+                    head = yeniOgrenci;
+                    tail = yeniOgrenci;
+                }
+                else
+                {
+                    yeniOgrenci.Next = head;
+                    head = yeniOgrenci;
+                }
+                Console.WriteLine($"{yeniOgrenci.numara} numaralı öğrenci listenin başına eklendi.");
+            }
+
+            public void SonaEkle(OgrenciNode yeniOgrenci)
+            {
+                if (head == null)
+                {
+                    head = yeniOgrenci;
+                    tail = yeniOgrenci;
+                }
+                else
+                {
+                    tail.Next = yeniOgrenci;
+                    tail = yeniOgrenci;
+                }
+                Console.WriteLine($"{yeniOgrenci.numara} numaralı öğrenci listenin sonuna eklendi.");
+            }
+
+            public void NumaraSonrasinaEkle(string arananNumara, OgrenciNode yeniOgrenci)
+            {
+                OgrenciNode arananNode = NumarayaGoreBul(arananNumara);
+
+                if (arananNode == null)
+                {
+                    Console.WriteLine($"{arananNumara} numaralı öğrenci listede bulunamadı.");
+                    return;
+                }
+
+                if (arananNode == tail)
+                {
+                    SonaEkle(yeniOgrenci);
+                }
+                else
+                {
+                    yeniOgrenci.Next = arananNode.Next;
+                    arananNode.Next = yeniOgrenci;
+                    Console.WriteLine($"{yeniOgrenci.numara} numaralı öğrenci, {arananNumara} numaralı öğrenciden sonraya eklendi.");
+                }
+            }
+
+            public void NumaraOncesineEkle(string arananNumara, OgrenciNode yeniOgrenci)
+            {
+                if (head == null)
+                {
+                    Console.WriteLine("Liste boş. Ekleme yapılamadı.");
+                    return;
+                }
+
+                if (head.numara == arananNumara)
+                {
+                    BasaEkle(yeniOgrenci);
+                    return;
+                }
+
+                OgrenciNode current = head;
+                while (current.Next != null && current.Next.numara != arananNumara)
+                {
+                    current = current.Next;
+                }
+
+                if (current.Next == null)
+                {
+                    Console.WriteLine($"{arananNumara} numaralı öğrenci listede bulunamadı.");
+                }
+                else
+                {
+                    yeniOgrenci.Next = current.Next;
+                    current.Next = yeniOgrenci;
+                    Console.WriteLine($"{yeniOgrenci.numara} numaralı öğrenci, {arananNumara} numaralı öğrenciden önceye eklendi.");
+                }
+            }
+
+            public void BastanSil()
+            {
+                if (head == null)
+                {
+                    Console.WriteLine("Liste zaten boş.");
+                    return;
+                }
+
+                string silinenAd = head.ad;
+                head = head.Next;
+
+                if (head == null)
+                {
+                    tail = null;
+                }
+                Console.WriteLine($"{silinenAd} adlı öğrenci baştan silindi.");
+            }
+
+            public void SondanSil()
+            {
+                if (head == null)
+                {
+                    Console.WriteLine("Liste zaten boş.");
+                    return;
+                }
+
+                string silinenAd = tail.ad;
+
+                if (head == tail)
+                {
+                    head = null;
+                    tail = null;
+                }
+                else
+                {
+                    OgrenciNode current = head;
+                    while (current.Next != tail)
+                    {
+                        current = current.Next;
+                    }
+                    tail = current;
+                    tail.Next = null;
+                }
+                Console.WriteLine($"{silinenAd} adlı öğrenci sondan silindi.");
+            }
+
+            public void NumarayaGoreSil(string silinecekNumara)
+            {
+                if (head == null)
+                {
+                    Console.WriteLine("Liste boş. Silme yapılamadı.");
+                    return;
+                }
+
+                if (head.numara == silinecekNumara)
+                {
+                    BastanSil();
+                    return;
+                }
+
+                OgrenciNode current = head;
+                while (current.Next != null && current.Next.numara != silinecekNumara)
+                {
+                    current = current.Next;
+                }
+
+                if (current.Next == null)
+                {
+                    Console.WriteLine($"{silinecekNumara} numaralı öğrenci bulunamadı.");
+                }
+                else
+                {
+                    OgrenciNode silinecekNode = current.Next;
+                    if (silinecekNode == tail)
+                    {
+                        tail = current;
+                    }
+                    current.Next = silinecekNode.Next;
+                    Console.WriteLine($"{silinecekNode.ad} adlı, {silinecekNumara} numaralı öğrenci silindi.");
+                }
+            }
+
+            public void NumaraOncesiniSil(string arananNumara)
+            {
+                if (head == null || head.Next == null)
+                {
+                    Console.WriteLine("Öncesi silinebilecek yeterli öğrenci yok.");
+                    return;
+                }
+
+                if (head.Next.numara == arananNumara)
+                {
+                    BastanSil();
+                    return;
+                }
+
+                OgrenciNode current = head;
+                while (current.Next.Next != null && current.Next.Next.numara != arananNumara)
+                {
+                    current = current.Next;
+                }
+
+                if (current.Next.Next == null)
+                {
+                    Console.WriteLine($"{arananNumara} numaralı öğrenci bulunamadı veya öncesi silinemiyor.");
+                }
+                else
+                {
+                    OgrenciNode silinecekNode = current.Next;
+                    current.Next = current.Next.Next;
+                    Console.WriteLine($"{arananNumara} numaralı öğrenciden önceki {silinecekNode.numara} numaralı öğrenci silindi.");
+                }
+            }
+
+            public void NumaraSonrasiniSil(string arananNumara)
+            {
+                OgrenciNode arananNode = NumarayaGoreBul(arananNumara);
+
+                if (arananNode == null)
+                {
+                    Console.WriteLine($"{arananNumara} numaralı öğrenci bulunamadı.");
+                    return;
+                }
+
+                if (arananNode.Next == null)
+                {
+                    Console.WriteLine($"{arananNumara} numaralı öğrencinin sonrasında silinecek bir öğrenci yok.");
+                    return;
+                }
+
+                OgrenciNode silinecekNode = arananNode.Next;
+                if (silinecekNode == tail)
+                {
+                    tail = arananNode;
+                }
+
+                arananNode.Next = silinecekNode.Next;
+                Console.WriteLine($"{arananNumara} numaralı öğrenciden sonraki {silinecekNode.numara} numaralı öğrenci silindi.");
+            }
+
+            public OgrenciNode NumarayaGoreBul(string numara)
+            {
+                OgrenciNode current = head;
+                while (current != null)
+                {
+                    if (current.numara == numara)
+                    {
+                        return current;
+                    }
+                    current = current.Next;
+                }
+                return null;
+            }
+
+            public void OgrenciAra(string numara)
+            {
+                OgrenciNode bulunan = NumarayaGoreBul(numara);
+                if (bulunan != null)
+                {
+                    Console.WriteLine($"--- BULUNAN ÖĞRENCİ ---");
+                    Console.WriteLine($"Numara: {bulunan.numara}");
+                    Console.WriteLine($"Ad: {bulunan.ad}");
+                    Console.WriteLine($"Soyad: {bulunan.soyad}");
+                    Console.WriteLine($"-----------------------");
+                }
+                else
+                {
+                    Console.WriteLine($"{numara} numaralı öğrenci listede bulunamadı.");
+                }
+            }
+
+            public void Listele()
+            {
+                if (head == null)
+                {
+                    Console.WriteLine("Öğrenci Listesi Boş.");
+                    return;
+                }
+
+                Console.WriteLine("--- ÖĞRENCİ LİSTESİ ---");
+                OgrenciNode current = head;
+                while (current != null)
+                {
+                    Console.WriteLine($"Numara: {current.numara} | Ad: {current.ad} | Soyad: {current.soyad}");
+                    current = current.Next;
+                }
+                Console.WriteLine("-------------------------");
+            }
+        }
+
+        internal class Program
+        {
+            static void Main(string[] args)
+            {
+                BagliListe ogrenciListesi = new BagliListe();
+
+                ogrenciListesi.BasaEkle(new OgrenciNode("101", "Ali", "Veli"));
+                ogrenciListesi.SonaEkle(new OgrenciNode("102", "Ayşe", "Fatma"));
+                ogrenciListesi.SonaEkle(new OgrenciNode("103", "Mehmet", "Yılmaz"));
+                Console.Clear();
+
+                string secim = "";
+                while (secim != "0")
+                {
+                    Console.WriteLine("\n===== ÖĞRENCİ YÖNETİM SİSTEMİ =====");
+                    Console.WriteLine("--- EKLEME İŞLEMLERİ ---");
+                    Console.WriteLine("1. Başa Öğrenci Ekle");
+                    Console.WriteLine("2. Sona Öğrenci Ekle");
+                    Console.WriteLine("3. Numaradan Sonraya Ekle");
+                    Console.WriteLine("4. Numaradan Önceye Ekle");
+                    Console.WriteLine("--- SİLME İŞLEMLERİ ---");
+                    Console.WriteLine("5. Baştan Öğrenci Sil");
+                    Console.WriteLine("6. Sondan Öğrenci Sil");
+                    Console.WriteLine("7. Numaraya Göre Öğrenci Sil");
+                    Console.WriteLine("8. Numaradan Öncesini Sil");
+                    Console.WriteLine("9. Numaradan Sonrasını Sil");
+                    Console.WriteLine("--- GÖRÜNTÜLEME İŞLEMLERİ ---");
+                    Console.WriteLine("10. Öğrenci Ara (Numaraya Göre)");
+                    Console.WriteLine("11. Tüm Öğrencileri Listele");
+                    Console.WriteLine("0. Çıkış");
+                    Console.Write("\nLütfen seçiminizi yapınız: ");
+                    secim = Console.ReadLine();
+
+                    Console.Clear();
+
+                    try
+                    {
+                        switch (secim)
+                        {
+                            case "1":
+                                OgrenciNode yeniOgrenci1 = OgrenciBilgisiAl();
+                                ogrenciListesi.BasaEkle(yeniOgrenci1);
+                                break;
+                            case "2":
+                                OgrenciNode yeniOgrenci2 = OgrenciBilgisiAl();
+                                ogrenciListesi.SonaEkle(yeniOgrenci2);
+                                break;
+                            case "3":
+                                string arananNumara3 = NumaraAl("Hangi öğrenciden SONRAYA eklenecek?");
+                                OgrenciNode yeniOgrenci3 = OgrenciBilgisiAl();
+                                ogrenciListesi.NumaraSonrasinaEkle(arananNumara3, yeniOgrenci3);
+                                break;
+                            case "4":
+                                string arananNumara4 = NumaraAl("Hangi öğrenciden ÖNCEYE eklenecek?");
+                                OgrenciNode yeniOgrenci4 = OgrenciBilgisiAl();
+                                ogrenciListesi.NumaraOncesineEkle(arananNumara4, yeniOgrenci4);
+                                break;
+                            case "5":
+                                ogrenciListesi.BastanSil();
+                                break;
+                            case "6":
+                                ogrenciListesi.SondanSil();
+                                break;
+                            case "7":
+                                string arananNumara7 = NumaraAl("Silinecek öğrencinin numarası:");
+                                ogrenciListesi.NumarayaGoreSil(arananNumara7);
+                                break;
+                            case "8":
+                                string arananNumara8 = NumaraAl("Hangi öğrenciden ÖNCEKİ silinecek?");
+                                ogrenciListesi.NumaraOncesiniSil(arananNumara8);
+                                break;
+                            case "9":
+                                string arananNumara9 = NumaraAl("Hangi öğrenciden SONRAKİ silinecek?");
+                                ogrenciListesi.NumaraSonrasiniSil(arananNumara9);
+                                break;
+                            case "10":
+                                string arananNumara10 = NumaraAl("Aranacak öğrencinin numarası:");
+                                ogrenciListesi.OgrenciAra(arananNumara10);
+                                break;
+                            case "11":
+                                ogrenciListesi.Listele();
+                                break;
+                            case "0":
+                                Console.WriteLine("Programdan çıkılıyor...");
+                                break;
+                            default:
+                                Console.WriteLine("Geçersiz bir seçim yaptınız. Lütfen 0-11 arası bir değer girin.");
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Bir hata oluştu: " + ex.Message);
+                    }
+
+                    if (secim != "0")
+                    {
+                        Console.WriteLine("\nDevam etmek için bir tuşa basın...");
+                        Console.ReadKey();
+                        Console.Clear();
+                    }
+                }
+            }
+
+            public static OgrenciNode OgrenciBilgisiAl()
+            {
+                Console.WriteLine("--- Yeni Öğrenci Bilgileri ---");
+                Console.Write("Numara: ");
+                string numara = Console.ReadLine();
+                Console.Write("Ad: ");
+                string ad = Console.ReadLine();
+                //Console.Write("Soyad: ");
+                string soyad = Console.ReadLine();
+
+                return new OgrenciNode(numara, ad, soyad);
+            }
+
+            public static string NumaraAl(string mesaj)
+            {
+                Console.WriteLine(mesaj);
+                Console.Write("Öğrenci Numarası: ");
+                return Console.ReadLine();
+            }
+        }
+    }
+}
